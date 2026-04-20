@@ -2,11 +2,32 @@
 
 Real-time chat application using a WebSocket server to relay messages between a React frontend and Google Dialogflow ES.
 
-## Architecture
+## Architecture (Professional Layered Design)
 
-1.  **Frontend (React/Vite)**: A premium chat UI that connects to the backend via WebSocket.
-2.  **Backend (Express.js)**: A WebSocket server that listens for client messages and communicates with Dialogflow ES via the official SDK.
-3.  **Dialogflow ES Integration**: The server uses the `DetectIntent` API to process user messages and retrieve responses.
+The backend follows a professional, layered architecture to ensure scalability and maintainability:
+
+1.  **Entry Point (`src/server.js`)**: Initializes the HTTP and WebSocket servers.
+2.  **App (`src/app.js`)**: Configures Express, CORS, and global middlewares.
+3.  **Controllers (`src/controllers/`)**: Manages WebSocket events and coordinates between services.
+4.  **Services (`src/services/`)**: Handles core business logic, such as communicating with Dialogflow ES.
+5.  **Repositories (`src/repositories/`)**: Abstracts Data Access (e.g., In-memory session store).
+6.  **Utils (`src/utils/`)**: Shared utilities like Google Auth management.
+
+## Project Structure
+
+```text
+/server
+  /src
+    /controllers    # WebSocket and Route handlers
+    /services       # Business & Dialogflow logic
+    /repositories   # Data abstraction (Sessions)
+    /utils          # Google Auth & Helpers
+    app.js          # Express app configuration
+    server.js       # Main entry point
+  package.json
+/client
+  /src              # React Frontend
+```
 
 ## Prerequisites
 
