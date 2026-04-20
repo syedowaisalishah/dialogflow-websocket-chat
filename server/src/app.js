@@ -4,11 +4,16 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const webhookRoutes = require('./routes/webhook.routes');
+
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/webhook', webhookRoutes);
 
 // Health Check Route
 app.get('/health', (req, res) => {
