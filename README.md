@@ -1,6 +1,34 @@
 # Dialogflow ES WebSocket Chat
 
-Real-time chat application using a WebSocket server to relay messages between a React frontend and Google Dialogflow ES.
+## Quick Start (Hybrid Setup)
+
+This project is configured to run the **Backend in Docker** and the **Frontend locally** for optimal development flexibility.
+
+### 1. Start Backend (Docker)
+1.  Place your `your-service-account.json` in the root directory.
+2.  Run:
+    ```bash
+    docker compose up --build
+    ```
+    The backend will be available at `ws://localhost:3001`.
+
+### 2. Start Frontend (Locale)
+1.  Navigate to the `client` directory:
+    ```bash
+    cd client
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
+4.  Access the chat at `http://localhost:5173` (or the port shown in your terminal).
+
+---
+
 
 ## Architecture (Professional Layered Design)
 
@@ -76,10 +104,26 @@ The backend follows a professional, layered architecture to ensure scalability a
     npm run dev
     ```
 
+### 3. Fulfillment Webhook (Optional)
+
+The backend includes a fulfillment webhook to handle complex logic (e.g., flight booking).
+
+1.  Expose your local server using a tool like `ngrok`:
+    ```bash
+    ngrok http 3001
+    ```
+2.  In the Dialogflow Console, go to **Fulfillment** -> **Webhook** -> **Enabled**.
+3.  Set the URL to: `https://your-ngrok-url/webhook`.
+4.  Enable fulfillment for specific intents (e.g., `book_flight`).
+
 ## Functionality Overview
 
 ### Real-time Communication
-The app uses a bi-directional WebSocket connection. When a user sends a message, it's immediately pushed to the server. The server asynchronously calls the Dialogflow ES API, waits for the response, and then pushes it back to the specific client.
+The app uses a bi-directional WebSocket connection. When a user sends a message, it's immediately pushed to the server. The server asynchronously calls the Dialogflow ES API via REST, waits for the response, and then pushes it back to the specific client.
+
+### Conversational Logic
+- **WebSocket Relay**: Handles the real-time message loop.
+- **Fulfillment Webhook**: Processes intent-specific parameter fulfillment (e.g., extracting destination and departure for flight booking and returning a dynamic confirmation message).
 
 ### Error Handling
 - **WebSocket**: Handles connection drops and reconnection states in the UI.
