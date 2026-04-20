@@ -6,6 +6,7 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [ws, setWs] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -14,35 +15,43 @@ function App() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   useEffect(() => {
-    // Initialize WebSocket connection
-    const socket = new WebSocket('ws://localhost:3001');
+    const connectWS = () => {
+      const socket = new WebSocket('ws://localhost:3001');
 
-    socket.onopen = () => {
-      console.log('Connected to server');
-      setIsConnected(true);
+      socket.onopen = () => {
+        console.log('Connected to server');
+        setIsConnected(true);
+      };
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.text) {
+          setMessages((prev) => [...prev, data]);
+          setIsTyping(false);
+        }
+      };
+
+      socket.onclose = () => {
+        console.log('Disconnected from server. Retrying...');
+        setIsConnected(false);
+        setTimeout(connectWS, 3000); // Auto-reconnect
+      };
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        socket.close();
+      };
+
+      setWs(socket);
     };
 
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setMessages((prev) => [...prev, data]);
-    };
-
-    socket.onclose = () => {
-      console.log('Disconnected from server');
-      setIsConnected(false);
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    setWs(socket);
+    connectWS();
 
     return () => {
-      socket.close();
+      if (ws) ws.close();
     };
   }, []);
 
@@ -58,25 +67,38 @@ function App() {
     setMessages((prev) => [...prev, newMessage]);
     ws.send(JSON.stringify({ text: inputText }));
     setInputText('');
+    setIsTyping(true);
   };
 
   return (
     <div className="chat-container">
       <header className="chat-header">
-        <h1>Dialogflow Assistant</h1>
-        <div className={`status ${isConnected ? 'online' : 'offline'}`}>
-          {isConnected ? '● Online' : '○ Offline'}
+        <div className="header-info">
+          <h1>Dialogflow Bot</h1>
+          <p className={`status ${isConnected ? 'online' : 'offline'}`}>
+            {isConnected ? '● Service Connected' : '○ Reconnecting...'}
+          </p>
         </div>
       </header>
 
       <div className="chat-messages">
         {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender}`}>
-            {msg.text}
+          <div key={index} className={`message-wrapper ${msg.sender}`}>
+            <div className="avatar">
+              {msg.sender === 'bot' ? '🤖' : '👤'}
+            </div>
+            <div className={`message ${msg.sender}`}>
+              {msg.text}
+            </div>
           </div>
         ))}
-        {messages.length === 0 && !isConnected && (
-          <div className="message bot">Connecting to server...</div>
+        {isTyping && (
+          <div className="message-wrapper bot">
+            <div className="avatar">🤖</div>
+            <div className="message bot typing">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
@@ -86,11 +108,13 @@ function App() {
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Type a message..."
+          placeholder="Ask me something..."
           disabled={!isConnected}
         />
         <button type="submit" disabled={!inputText.trim() || !isConnected}>
-          Send
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+          </svg>
         </button>
       </form>
     </div>
