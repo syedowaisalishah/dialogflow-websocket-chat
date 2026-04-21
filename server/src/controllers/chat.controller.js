@@ -35,6 +35,8 @@ class ChatController {
             console.log(`[ChatController] Message from ${sessionId}: ${userText}`);
 
             const result = await dialogflowService.detectIntent(sessionId, userText);
+            console.log(`[ChatController] Matched Intent: ${result.intent ? result.intent.displayName : 'None'}`);
+            console.log(`[ChatController] Fulfillment Text: ${result.fulfillmentText}`);
 
             ws.send(JSON.stringify({
                 text: result.fulfillmentText,
