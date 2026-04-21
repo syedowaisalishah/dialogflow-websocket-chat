@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import './index.css'
 
 function App() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    { text: "Welcome to the Dialogflow Assistant! How can I help you today?", sender: 'bot', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+  ]);
   const [inputText, setInputText] = useState('');
   const [ws, setWs] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -22,26 +24,27 @@ function App() {
       const socket = new WebSocket('ws://localhost:3001');
 
       socket.onopen = () => {
-        console.log('Connected to server');
         setIsConnected(true);
       };
 
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.text) {
-          setMessages((prev) => [...prev, data]);
+          const receivedMessage = {
+            ...data,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          setMessages((prev) => [...prev, receivedMessage]);
           setIsTyping(false);
         }
       };
 
       socket.onclose = () => {
-        console.log('Disconnected from server. Retrying...');
         setIsConnected(false);
-        setTimeout(connectWS, 3000); // Auto-reconnect
+        setTimeout(connectWS, 3000);
       };
 
-      socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
+      socket.onerror = () => {
         socket.close();
       };
 
@@ -61,7 +64,8 @@ function App() {
 
     const newMessage = {
       text: inputText,
-      sender: 'user'
+      sender: 'user',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages((prev) => [...prev, newMessage]);
@@ -71,49 +75,69 @@ function App() {
   };
 
   return (
-    <div className="chat-container">
-      <header className="chat-header">
-        <div className="header-info">
-          <h1>Dialogflow Bot</h1>
-          <p className={`status ${isConnected ? 'online' : 'offline'}`}>
-            {isConnected ? '● Service Connected' : '○ Reconnecting...'}
-          </p>
+    <div className="whatsapp-container">
+      {/* Header */}
+      <header className="whatsapp-header">
+        <div className="header-left">
+          <div className="header-avatar">🤖</div>
+          <div className="header-info">
+            <span className="bot-name">Dialogflow Assistant</span>
+            <span className={`status ${isConnected ? 'online' : 'offline'}`}>
+              {isConnected ? 'online' : 'reconnecting...'}
+            </span>
+          </div>
+        </div>
+        <div className="header-right">
+          <button className="icon-btn">🔍</button>
+          <button className="icon-btn">⋮</button>
         </div>
       </header>
 
-      <div className="chat-messages">
-        {messages.map((msg, index) => (
-          <div key={index} className={`message-wrapper ${msg.sender}`}>
-            <div className="avatar">
-              {msg.sender === 'bot' ? '🤖' : '👤'}
+      {/* Main Chat Area */}
+      <div className="whatsapp-chat-area">
+        <div className="message-list">
+          {messages.map((msg, index) => (
+            <div key={index} className={`message-bubble-wrapper ${msg.sender}`}>
+              <div className={`message-bubble ${msg.sender}`}>
+                <div className="message-content">{msg.text}</div>
+                <div className="message-meta">
+                  <span className="message-time">{msg.time}</span>
+                  {msg.sender === 'user' && (
+                    <span className="message-status">✓✓</span>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className={`message ${msg.sender}`}>
-              {msg.text}
+          ))}
+          {isTyping && (
+            <div className="message-bubble-wrapper bot">
+              <div className="message-bubble bot typing">
+                <div className="dot"></div>
+                <div className="dot"></div>
+                <div className="dot"></div>
+              </div>
             </div>
-          </div>
-        ))}
-        {isTyping && (
-          <div className="message-wrapper bot">
-            <div className="avatar">🤖</div>
-            <div className="message bot typing">
-              <span></span><span></span><span></span>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
-      <form className="chat-input-area" onSubmit={handleSend}>
-        <input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Ask me something..."
-          disabled={!isConnected}
-        />
-        <button type="submit" disabled={!inputText.trim() || !isConnected}>
+      {/* Input Area */}
+      <form className="whatsapp-input-area" onSubmit={handleSend}>
+        <button type="button" className="icon-btn emoji-btn">😊</button>
+        <button type="button" className="icon-btn attach-btn">📎</button>
+        <div className="input-field-container">
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Type a message"
+            disabled={!isConnected}
+          />
+        </div>
+        <button type="submit" className="send-btn" disabled={!inputText.trim() || !isConnected}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+            <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
           </svg>
         </button>
       </form>
