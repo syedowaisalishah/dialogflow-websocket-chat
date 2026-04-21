@@ -87,10 +87,6 @@ function App() {
             </span>
           </div>
         </div>
-        <div className="header-right">
-          <button className="icon-btn">🔍</button>
-          <button className="icon-btn">⋮</button>
-        </div>
       </header>
 
       {/* Main Chat Area */}
@@ -124,8 +120,6 @@ function App() {
 
       {/* Input Area */}
       <form className="whatsapp-input-area" onSubmit={handleSend}>
-        <button type="button" className="icon-btn emoji-btn">😊</button>
-        <button type="button" className="icon-btn attach-btn">📎</button>
         <div className="input-field-container">
           <input
             type="text"

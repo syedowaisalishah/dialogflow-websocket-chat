@@ -1,14 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --wa-header: #075E54;
-  --wa-teal: #128C7E;
-  --wa-light-green: #25D366;
-  --wa-bg: #ece5dd;
-  --wa-user-bubble: #dcf8c6;
-  --wa-bot-bubble: #ffffff;
-  --wa-text: #000000;
-  --wa-meta: #727272;
+  --wa-header: #202c33;
+  --wa-teal: #00a884;
+  --wa-bg: #0b141a;
+  --wa-chat-bg: #0b141a;
+  --wa-user-bubble: #005c4b;
+  --wa-bot-bubble: #202c33;
+  --wa-text: #e9edef;
+  --wa-text-secondary: #8696a0;
+  --wa-input-bg: #2a3942;
+  --wa-meta: #8696a0;
 }
 
 * {
@@ -18,12 +20,13 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #dadbd3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0b141a;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--wa-text);
 }
 
 #root {
@@ -33,12 +36,11 @@ body {
 
 .whatsapp-container {
   width: 100%;
-  max-width: 1000px;
+  max-width: 100%;
   height: 100%;
-  background-color: var(--wa-bg);
+  background-color: var(--wa-chat-bg);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .06), 0 2px 5px 0 rgba(0, 0, 0, .2);
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -46,26 +48,27 @@ body {
 
 /* Header */
 .whatsapp-header {
-  background-color: var(--wa-teal);
-  color: #fff;
+  background-color: var(--wa-header);
+  color: var(--wa-text);
   padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 59px;
+  height: 60px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   z-index: 10;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .header-avatar {
   width: 40px;
   height: 40px;
-  background-color: #fff;
+  background-color: #6a7175;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -84,17 +87,12 @@ body {
 }
 
 .status {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.status.online {
-  color: #fff;
+  font-size: 13px;
+  color: var(--wa-teal);
 }
 
 .status.offline {
-  color: #ffcccc;
-  text-transform: capitalize;
+  color: #f15c5c;
 }
 
 .header-right {
@@ -120,10 +118,7 @@ body {
 .whatsapp-chat-area {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 7%;
-  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-  background-repeat: repeat;
-  background-size: 400px;
+  padding: 20px 5%;
   display: flex;
   flex-direction: column;
 }
@@ -131,7 +126,7 @@ body {
 .message-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .message-bubble-wrapper {
@@ -148,54 +143,35 @@ body {
 }
 
 .message-bubble {
-  max-width: 65%;
-  padding: 6px 7px 8px 9px;
-  border-radius: 7.5px;
+  max-width: 80%;
+  padding: 8px 12px;
+  border-radius: 8px;
   position: relative;
-  font-size: 14.2px;
-  line-height: 19px;
+  font-size: 15px;
+  line-height: 20px;
   box-shadow: 0 1px 0.5px rgba(0, 0, 0, .13);
 }
 
 .message-bubble.user {
   background-color: var(--wa-user-bubble);
-  border-top-right-radius: 0;
+  color: var(--wa-text);
 }
 
 .message-bubble.bot {
   background-color: var(--wa-bot-bubble);
-  border-top-left-radius: 0;
+  color: var(--wa-text);
 }
 
-/* Tails */
-.message-bubble::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-}
-
-.message-bubble.user::before {
-  right: -10px;
-  border-left-color: var(--wa-user-bubble);
-  border-top-color: var(--wa-user-bubble);
-}
-
-.message-bubble.bot::before {
-  left: -10px;
-  border-right-color: var(--wa-bot-bubble);
-  border-top-color: var(--wa-bot-bubble);
+.message-content {
+  word-wrap: break-word;
 }
 
 .message-meta {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 5px;
   margin-top: 4px;
-  margin-left: 20px;
 }
 
 .message-time {
@@ -204,18 +180,17 @@ body {
 }
 
 .message-status {
-  font-size: 14px;
-  color: #34b7f1;
-  font-weight: bold;
+  font-size: 15px;
+  color: #53bdeb;
 }
 
 /* Input Area */
 .whatsapp-input-area {
-  background-color: #f0f2f5;
-  padding: 5px 10px;
+  background-color: var(--wa-header);
+  padding: 10px 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   height: 62px;
 }
 
@@ -227,41 +202,43 @@ body {
 
 .input-field-container {
   flex: 1;
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 9px 12px;
+  background-color: var(--wa-input-bg);
+  border-radius: 20px;
+  padding: 0 15px;
   height: 42px;
+  display: flex;
+  align-items: center;
 }
 
 .input-field-container input {
   width: 100%;
+  background: transparent;
   border: none;
   outline: none;
   font-size: 15px;
-  color: #41525d;
+  color: var(--wa-text);
 }
 
 .send-btn {
   background: none;
   border: none;
-  color: #54656f;
+  color: var(--wa-teal);
   cursor: pointer;
-  padding: 8px;
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .send-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  opacity: 0.3;
 }
 
 /* Typing indicator */
 .typing .dot {
   width: 6px;
   height: 6px;
-  background: #919191;
+  background: var(--wa-teal);
   border-radius: 50%;
   display: inline-block;
   margin: 0 2px;
