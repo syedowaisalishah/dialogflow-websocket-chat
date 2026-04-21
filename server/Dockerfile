@@ -16,5 +16,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 3001
 
-# Start the server
-CMD [ "npm", "start" ]
+# Start the server using nodemon for hot-reloading
+CMD [ "npm", "run", "dev" ]

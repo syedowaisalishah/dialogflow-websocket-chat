@@ -7,5 +7,6 @@ services:
       - ./server/.env
     volumes:
       - ./server/src:/app/src
-      - ./your-service-account.json:/app/your-service-account.json:ro
+      - ./server/.env:/app/.env
+      - ./chat-bot-service.json:/app/chat-bot-service.json:ro
     restart: always

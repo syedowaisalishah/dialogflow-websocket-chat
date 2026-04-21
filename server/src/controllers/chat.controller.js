@@ -18,6 +18,7 @@ class ChatController {
         });
 
         // Send welcome message
+        console.log(`[ChatController] Using Project ID: ${process.env.DIALOGFLOW_PROJECT_ID}`);
         ws.send(JSON.stringify({
             text: 'Welcome to the structured Dialogflow Assistant! How can I help?',
             sender: 'bot'
@@ -43,8 +44,9 @@ class ChatController {
         } catch (error) {
             console.error('[ChatController] Error:', error.message);
             ws.send(JSON.stringify({
-                error: 'Processing Error',
-                message: error.message
+                text: `Error: ${error.message}. Please ensure Dialogflow API is enabled.`,
+                sender: 'bot',
+                isError: true
             }));
         }
     }
