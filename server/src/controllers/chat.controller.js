@@ -1,4 +1,4 @@
-const dialogflowService = require('../services/dialogflow.service');
+const chatService = require('../services/chat.service');
 const sessionRepository = require('../repositories/session.repository');
 
 class ChatController {
@@ -17,9 +17,9 @@ class ChatController {
             console.log(`[ChatController] Client disconnected. Session: ${sessionId}`);
         });
 
-    // Welcome message handled by client
-    console.log(`[ChatController] Using Project ID: ${process.env.DIALOGFLOW_PROJECT_ID}`);
-}
+        // Greeting handled by client as requested
+        console.log(`[ChatController] Connection established for project: ${process.env.DIALOGFLOW_PROJECT_ID}`);
+    }
 
     async handleMessage(ws, message, sessionId) {
         try {
@@ -28,47 +28,26 @@ class ChatController {
 
             if (!userText) return;
 
-            console.log(`[ChatController] User Input: "${userText}"`);
+            console.log(`[ChatController] Input: "${userText}"`);
 
-            const result = await dialogflowService.detectIntent(sessionId, userText);
+            // Use service for business logic
+            const response = await chatService.processMessage(sessionId, userText);
 
-            // Full debug dump — diagnose empty/missing responses
-            console.log(`[ChatController] DIALOGFLOW RESULT:`, JSON.stringify({
-                intent: result.intent && result.intent.displayName,
-                fulfillmentText: result.fulfillmentText,
-                webhookStatus: result.webhookStatus,
-                fulfillmentMessages: result.fulfillmentMessages
-            }, null, 2));
-
-            let replyText = result.fulfillmentText;
-            
-            // Fallback strategy for empty fulfillmentText
-            if (!replyText || replyText.trim() === "") {
-                if (result.fulfillmentMessages && result.fulfillmentMessages.length > 0) {
-                    const msg = result.fulfillmentMessages[0];
-                    if (msg.text && msg.text.text && msg.text.text[0]) {
-                        replyText = msg.text.text[0];
-                        console.log(`[ChatController] Falling back to fulfillmentMessages[0]`);
-                    }
-                }
+            if (response) {
+                console.log(`[ChatController] Response: "${response.text}" (Intent: ${response.intent})`);
+                
+                ws.send(JSON.stringify({
+                    text: response.text,
+                    sender: 'bot'
+                }));
             }
-
-            if (!replyText || replyText.trim() === "") {
-                replyText = "(no response from agent)";
-                console.warn(`[ChatController] Warning: No text found in result matching intent "${result.intent ? result.intent.displayName : 'UNKNOWN'}"`);
-            }
-
-            console.log(`[ChatController] Final Reply: "${replyText}"`);
-
-            ws.send(JSON.stringify({
-                text: replyText,
-                sender: 'bot'
-            }));
 
         } catch (error) {
             console.error('[ChatController] Error:', error.message);
+            
+            // Standard user-facing error message
             ws.send(JSON.stringify({
-                text: `Error: ${error.message}. Please ensure Dialogflow API is enabled.`,
+                text: `Error: ${error.message}. Please check your connection or Dialogflow API status.`,
                 sender: 'bot',
                 isError: true
             }));
