@@ -32,14 +32,40 @@ class ChatController {
 
             if (!userText) return;
 
-            console.log(`[ChatController] Message from ${sessionId}: ${userText}`);
+            console.log(`[ChatController] User Input: "${userText}"`);
 
             const result = await dialogflowService.detectIntent(sessionId, userText);
-            console.log(`[ChatController] Matched Intent: ${result.intent ? result.intent.displayName : 'None'}`);
-            console.log(`[ChatController] Fulfillment Text: ${result.fulfillmentText}`);
+
+            // Full debug dump — diagnose empty/missing responses
+            console.log(`[ChatController] DIALOGFLOW RESULT:`, JSON.stringify({
+                intent: result.intent && result.intent.displayName,
+                fulfillmentText: result.fulfillmentText,
+                webhookStatus: result.webhookStatus,
+                fulfillmentMessages: result.fulfillmentMessages
+            }, null, 2));
+
+            let replyText = result.fulfillmentText;
+            
+            // Fallback strategy for empty fulfillmentText
+            if (!replyText || replyText.trim() === "") {
+                if (result.fulfillmentMessages && result.fulfillmentMessages.length > 0) {
+                    const msg = result.fulfillmentMessages[0];
+                    if (msg.text && msg.text.text && msg.text.text[0]) {
+                        replyText = msg.text.text[0];
+                        console.log(`[ChatController] Falling back to fulfillmentMessages[0]`);
+                    }
+                }
+            }
+
+            if (!replyText || replyText.trim() === "") {
+                replyText = "(no response from agent)";
+                console.warn(`[ChatController] Warning: No text found in result matching intent "${result.intent ? result.intent.displayName : 'UNKNOWN'}"`);
+            }
+
+            console.log(`[ChatController] Final Reply: "${replyText}"`);
 
             ws.send(JSON.stringify({
-                text: result.fulfillmentText,
+                text: replyText,
                 sender: 'bot'
             }));
 

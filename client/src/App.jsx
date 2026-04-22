@@ -29,13 +29,13 @@ function App() {
 
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        setIsTyping(false); // always clear typing indicator on any response
         if (data.text) {
           const receivedMessage = {
             ...data,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           };
           setMessages((prev) => [...prev, receivedMessage]);
-          setIsTyping(false);
         }
       };
 

@@ -1,34 +1,52 @@
 class WebhookController {
     async handleFulfillment(req, res) {
         const { queryResult } = req.body;
-        const intentName = queryResult.intent.displayName;
+        const rawIntentName = queryResult.intent.displayName;
+        const intentName = rawIntentName.toLowerCase().trim();
         const parameters = queryResult.parameters;
 
-        console.log(`[Webhook] Parameters Received:`, JSON.stringify(parameters));
-        console.log(`[Webhook] Contexts Received:`, JSON.stringify(queryResult.outputContexts));
-
-        let fulfillmentText = queryResult.fulfillmentText;
-
-        // Custom logic for "Flight Booking" fulfillment as seen in the diagram
-        const flightIntents = ['book_flight', 'Flight Booking - Final', 'FlightBooking', 'FlightBooking - yes'];
-        if (flightIntents.includes(intentName)) {
-            // If parameters are missing in the intent (common in follow-up intents), look in contexts
-            let finalParams = { ...parameters };
-            if (queryResult.outputContexts) {
-                queryResult.outputContexts.forEach(ctx => {
-                    if (ctx.parameters) {
-                        finalParams = { ...finalParams, ...ctx.parameters };
-                    }
-                });
-            }
-
-            const destination = finalParams.destination || 'your destination';
-            const departure = finalParams.departure || 'your departure city';
-            const passengers = finalParams.passengers || '1';
-            
-            fulfillmentText = `Great! I'll search for the best available flights from ${departure} to ${destination} for ${passengers} passenger(s) for you.`;
-            console.log(`[Webhook] Final Fulfillment Text: ${fulfillmentText}`);
+        console.log(`[Webhook] RECEIVED: intent="${rawIntentName}"`);
+        
+        // Merge parameters from all output contexts
+        let ctx = { ...parameters };
+        if (queryResult.outputContexts) {
+            queryResult.outputContexts.forEach(context => {
+                if (context.parameters) {
+                    ctx = { ...ctx, ...context.parameters };
+                }
+            });
         }
+
+        let fulfillmentText = queryResult.fulfillmentText || '';
+
+        // ── MATCHING LOGIC ──────────────────────────────────────────────────
+        
+        // 1. Route Intent (Where from/to)
+        if (intentName.includes('route')) {
+            fulfillmentText = 'How many passengers are traveling, and in which class would you prefer: economy, business, or first class?';
+        }
+
+        // 2. Passengers Intent (Count and Class)
+        else if (intentName.includes('passengers')) {
+            const departure  = ctx['geo-city']   || ctx['from']       || ctx['departure'] || 'your departure city';
+            const destination= ctx['geo-city1']  || ctx['to']         || ctx['destination'] || 'your destination';
+            const passengers = ctx['number']     || ctx['passengers'] || 1;
+            const seatClass  = ctx['seat-class'] || ctx['class']      || 'economy';
+
+            fulfillmentText = `Let me confirm: A flight from ${departure} to ${destination}, for ${passengers} passenger in ${seatClass} class. Is that correct?`;
+        }
+
+        // 3. Yes/Confirmation Intent
+        else if (intentName.includes('yes') || intentName.includes('confirm')) {
+            fulfillmentText = "Great! I'll search for the best available flights for you.";
+        }
+        
+        // 4. Default / Fallback
+        else {
+            console.log(`[Webhook] No specialized logic for: "${rawIntentName}". Using default text: "${fulfillmentText}"`);
+        }
+
+        console.log(`[Webhook] RESPONSE: text="${fulfillmentText}"`);
 
         return res.status(200).json({
             fulfillmentMessages: [
