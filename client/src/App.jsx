@@ -74,6 +74,20 @@ function App() {
     setIsTyping(true);
   };
 
+  const formatMessage = (text) => {
+    if (!text) return '';
+    // Replace *bold* with <strong>bold</strong>
+    const formatted = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+    return formatted;
+  };
+
+  const DoubleCheckIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1.5 12.5L5.5 16.5L14.5 7.5" stroke="#53BDEB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 12.5L12 16.5L22.5 6" stroke="#53BDEB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+
   return (
     <div className="whatsapp-container">
       {/* Header */}
@@ -87,6 +101,18 @@ function App() {
             </span>
           </div>
         </div>
+        <div className="header-right">
+          <button className="icon-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M15.9 14.3H15l-.3-.3c1-1.1 1.6-2.6 1.6-4.2 0-3.7-3-6.7-6.7-6.7S3 6 3 9.7s3 6.7 6.7 6.7c1.6 0 3.1-.6 4.2-1.6l.3.3v.9l6 6 1.8-1.8-1.8-1.8-6-6zm-6.2 0c-2.6 0-4.6-2.1-4.6-4.6s2.1-4.6 4.6-4.6 4.6 2.1 4.6 4.6-2 4.6-4.6 4.6z"></path>
+            </svg>
+          </button>
+          <button className="icon-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path>
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Main Chat Area */}
@@ -95,16 +121,23 @@ function App() {
           {messages.map((msg, index) => (
             <div key={index} className={`message-bubble-wrapper ${msg.sender}`}>
               <div className={`message-bubble ${msg.sender}`}>
-                <div className="message-content">{msg.text}</div>
+                <div
+                  className="message-content"
+                  dangerouslySetInnerHTML={{ __html: formatMessage(msg.text) }}
+                />
                 <div className="message-meta">
                   <span className="message-time">{msg.time}</span>
                   {msg.sender === 'user' && (
-                    <span className="message-status">✓✓</span>
+                    <span className="message-status">
+                      <DoubleCheckIcon />
+                    </span>
                   )}
                 </div>
               </div>
             </div>
           ))}
+
+
           {isTyping && (
             <div className="message-bubble-wrapper bot">
               <div className="message-bubble bot typing">
