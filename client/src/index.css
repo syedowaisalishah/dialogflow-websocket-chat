@@ -164,26 +164,35 @@ body {
 
 .message-bubble {
   max-width: 85%;
-  padding: 6px 10px 8px 12px;
-  border-radius: 12px;
+  padding: 10px 14px;
   position: relative;
-  font-size: 15px;
-  line-height: 1.5;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  font-size: 15.5px;
+  line-height: 1.6;
+  letter-spacing: 0.1px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px);
 }
 
 .message-bubble.user {
-  background-color: #005c4b;
-  color: #e9edef;
-  border-top-right-radius: 2px;
+  background: linear-gradient(135deg, #005c4b 0%, #007a63 100%);
+  color: #fff;
+  border-radius: 20px 20px 4px 20px;
+  /* Modern Asymmetric Pill */
+  border-right-color: rgba(255, 255, 255, 0.1);
 }
 
 .message-bubble.bot {
-  background-color: #202c33;
+  background: linear-gradient(135deg, #202c33 0%, #2a3942 100%);
   color: #e9edef;
-  border-top-left-radius: 2px;
+  border-radius: 20px 20px 20px 4px;
+  /* Modern Asymmetric Pill */
+  border-left-color: rgba(255, 255, 255, 0.1);
   font-weight: 500;
-  /* Medium weight for overall readability */
 }
 
 .message-content {
@@ -193,9 +202,11 @@ body {
 /* WhatsApp Bold Styling */
 .message-content strong,
 .message-content b {
-  font-weight: 800;
-  /* Extra bold for emphasis */
+  font-weight: 700;
   color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0 2px;
+  border-radius: 2px;
 }
 
 .message-meta {
