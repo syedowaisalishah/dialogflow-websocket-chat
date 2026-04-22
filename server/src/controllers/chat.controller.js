@@ -17,13 +17,9 @@ class ChatController {
             console.log(`[ChatController] Client disconnected. Session: ${sessionId}`);
         });
 
-        // Send welcome message
-        console.log(`[ChatController] Using Project ID: ${process.env.DIALOGFLOW_PROJECT_ID}`);
-        ws.send(JSON.stringify({
-            text: 'Welcome to the structured Dialogflow Assistant! How can I help?',
-            sender: 'bot'
-        }));
-    }
+    // Welcome message handled by client
+    console.log(`[ChatController] Using Project ID: ${process.env.DIALOGFLOW_PROJECT_ID}`);
+}
 
     async handleMessage(ws, message, sessionId) {
         try {
