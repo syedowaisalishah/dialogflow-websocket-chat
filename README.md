@@ -1,102 +1,103 @@
-# Dialogflow Real-time Chat Application
+# SkyBot: AI-Powered Real-time Flight Assistant ✈️🤖
 
-A high-performance, real-time flight booking assistant built using **React**, **Node.js**, **WebSockets**, and **Google Dialogflow ES**.
+[![license: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![React](https://img.shields.io/badge/frontend-React-blue.svg)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/backend-Node.js-green.svg)](https://nodejs.org/)
+[![Dialogflow](https://img.shields.io/badge/AI-Dialogflow%20ES-orange.svg)](https://cloud.google.com/dialogflow)
 
-## 🚀 Project Overview
-
-This application demonstrates a seamless integration between a modern frontend and Google's Dialogflow ES engine via a custom WebSocket relay server. It is designed to handle complex conversational flows, specifically optimized for a flight booking use case.
-
-### Key Features
-- **Real-time Communication:** Persistent WebSocket connection for instant message delivery.
-- **WhatsApp-Inspired UI:** Premium dark-themed interface with smooth animations and bold typography.
-- **Dialogflow ES Integration:** Uses Google’s REST API for robust intent detection and natural language processing.
-- **Clean Architecture:** Organized into Controllers, Services, and Repositories for scalability and maintainability.
-- **Fulfillment Webhook:** Custom logic for parameter extraction and confirmation flows.
+A sophisticated, event-driven chat application that bridges the gap between natural language processing and real-time user interfaces. SkyBot leverages Google's Dialogflow ES engine to provide a seamless flight booking experience through a custom WebSocket relay.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🚀 Key Highlights
 
-The system follows a three-tier architecture to ensure separation of concerns:
+- **🔌 Event-Driven Architecture:** Utilizing WebSockets for sub-second latency and persistent, low-overhead communication.
+- **🎨 Premium UI/UX:** A high-fidelity, WhatsApp-inspired dark interface built with **React** and tailored CSS variables.
+- **🛡️ Security-First Proxy:** All AI interactions are proxied through a Node.js relay server, ensuring Google Cloud credentials never touch the client-side.
+- **🧩 Modular Backend:** Built using a **Service-Oriented Architecture (SOA)** with clear separation between transport (Controllers) and business logic (Services).
+- **📝 Stateful Webhooks:** Optimized Dialogflow fulfillment logic that maintains context-aware parameters across complex conversational turns.
 
-1.  **Frontend (React):** Manages the UI/UX and maintains a persistent WebSocket connection to the relay server.
-2.  **Relay Server (Node.js/Express):** Handles WebSocket lifecycles and acts as a gateway between the client and Google Cloud.
-3.  **Dialogflow ES (NLP Engine):** Processes natural language, extracts entities (cities, passenger count, class), and triggers fulfillment.
+---
+
+## 🏗️ System Architecture
+
+SkyBot is built on a robust three-tier architecture designed for scalability and security:
+
+1.  **Client Tier (React):** A sleek, reactive frontend that manages connection lifecycles and provides feedback with typing indicators and blue-check delivery receipts.
+2.  **Relay Tier (Node.js/Express):** A custom WebSocket orchestration layer that handles high-concurrency requests and acts as a secure bridge to Google's NLP API.
+3.  **Intelligence Tier (Dialogflow ES):** Uses advanced intent matching and entity extraction to parse traveler requirements (cities, passenger counts, cabin classes).
 
 ```mermaid
-graph LR
-    User(User) <-->|WebSocket| Relay[Node.js Relay Server]
-    Relay <-->|HTTPS REST| DF[Dialogflow ES]
-    DF <-->|HTTPS| Webhook[Fulfillment Webhook]
+graph TD
+    A[End User] <-->|Bidirectional WebSockets| B[Node.js Relay Server]
+    B <-->|Secure REST API| C[Dialogflow NLP Engine]
+    C <-->|HTTPS Webhook| D[Fulfillment Service]
+    D -->|Logic Processing| D
 ```
 
 ---
 
-## 🛠️ Tech Stack
-- **Frontend:** React, Vanilla CSS (Plus Jakarta Sans)
-- **Backend:** Node.js, Express, `ws` (WebSockets)
-- **APIs:** Google Cloud Dialogflow ES API, Google Auth Library
-- **Development Tools:** Vite, Nodemon, Ngrok
+## 🛠️ Technical Stack
+
+- **Frontend:** React, Vanilla CSS3 (Custom Variables), Plus Jakarta Sans.
+- **Backend:** Node.js, Express.js, `ws` (WebSockets).
+- **NLP & AI:** Google Cloud Dialogflow ES, Google Auth Library.
+- **Infrastructure:** Docker, Docker Compose, Vite.
 
 ---
 
 ## 🚦 Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- A Google Cloud Service Account JSON key with `Dialogflow API Client` permissions.
+- Node.js (v18.0+)
+- Google Cloud Platform Account (Dialogflow API enabled)
+- A Service Account JSON key stored in `server/service-account.json`.
 
 ### 1. Installation
-Clone the repository and install dependencies for both the client and server:
+Clone the repository and install the dependencies:
 
 ```bash
-# Install root/server dependencies
-cd server
-npm install
+# Backend Setup
+cd server && npm install
 
-# Install client dependencies
-cd ../client
-npm install
+# Frontend Setup
+cd ../client && npm install
 ```
 
-### 2. Environment Configuration
+### 2. Configuration
 Create a `.env` file in the `/server` directory:
-
 ```env
 PORT=3001
 DIALOGFLOW_PROJECT_ID=your-project-id
-GOOGLE_APPLICATION_CREDENTIALS=../chat-bot-service.json
+GOOGLE_APPLICATION_CREDENTIALS=service-account.json
 ```
 
-### 3. Running the Project
+### 3. Execution
+Launch both services using the built-in development scripts:
 
-**Start the Backend:**
 ```bash
-cd server
-npm run dev
-```
+# Terminal 1: Server
+cd server && npm run dev
 
-**Start the Frontend:**
-```bash
-cd client
-npm run dev
+# Terminal 2: Client
+cd client && npm run dev
 ```
 
 ---
 
-## ✈️ Flight Booking Flow
-The assistant is trained to handle the following sequential flow:
-1.  **Trigger:** "I need to book a flight."
-2.  **Route:** User provides departure and destination cities.
-3.  **Details:** Assistant asks for number of passengers and travel class.
-4.  **Confirmation:** User confirms the summarized details ("Yes").
-5.  **Success:** Bot confirms flight search initialization.
+## 🧠 Design Philosophy
+
+- **Decoupling:** The logic for "how a message is sent" (WebSockets) is completely separate from "what a message means" (NLP logic).
+- **Latency Optimization:** By using WebSockets instead of traditional polling or individual HTTP requests, we achieve a conversational flow that feels "alive."
+- **User Trust:** Features like read receipts and typing animations are implemented to mirror the psychological comfort of modern IM apps like WhatsApp.
 
 ---
 
-## 📄 Submission Requirements
-As per **Evaluation Test 4**, this project includes:
-- [x] Clean, well-organized code.
-- [x] Architecture overview and key components.
-- [x] Full end-to-end flight booking interaction.
-- [x] README with setup instructions.
+## � Future Roadmap
+- [ ] Support for multiple conversation sessions via Redis labels.
+- [ ] Integration with real-time flight search APIs (e.g., Amadeus or Skyscanner).
+- [ ] Multi-language support using Dialogflow's localization features.
+
+---
+
+**Developed with ❤️ for high-performance AI interactions.**
